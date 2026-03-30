@@ -7,7 +7,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
 body{display:flex;height:100vh;background:#ffffff;color:#000;}
-.sidebar{width:220px;background:#f0f0f0;border-right:1px solid #ddd;display:flex;flex-direction:column;padding:20px;}
+.sidebar{width:220px;background:#f8f8f8;border-right:1px solid #ddd;display:flex;flex-direction:column;padding:20px;}
 .sidebar img{width:100%;margin-bottom:30px;}
 .sidebar button{padding:12px 15px;margin-bottom:10px;border:none;border-radius:8px;background:#e0e0e0;cursor:pointer;font-weight:bold;text-align:left;}
 .sidebar button:hover{background:#d0d0d0;}
@@ -26,13 +26,19 @@ button.ask{padding:12px 20px;margin-left:10px;border:none;border-radius:8px;back
 button.ask:hover{background:#0099cc;}
 .footer{text-align:center;margin-top:15px;font-size:13px;opacity:0.7;}
 .typing{font-style:italic;color:#aaa;}
+@media (max-width:768px){
+  body{flex-direction:column;}
+  .sidebar{width:100%;display:flex;flex-direction:row;overflow-x:auto;}
+  .sidebar button{flex:1;margin-right:10px;}
+  .main{padding:10px;}
+}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
     <!-- Logo -->
-    <img src="your-logo.png" alt="Logo"> <!-- replace with your logo -->
+    <img src="logo.png" alt="Logo"> <!-- replace with your logo -->
 
     <button id="newChat">New Chat</button>
     <button id="searchChats">Search Chats</button>
@@ -43,7 +49,7 @@ button.ask:hover{background:#0099cc;}
 
 <div class="main">
     <div class="header">
-        <h1>Welcome </h1>
+        <h1>Welcome Syed</h1>
         <p>How are you?</p>
     </div>
 
@@ -63,21 +69,19 @@ button.ask:hover{background:#0099cc;}
 
 <script>
 let chatHistory = [];
-
 const chatContainer = document.getElementById("chat");
 const input = document.getElementById("question");
 
-// Load chat history from localStorage if exists
+// Load history from localStorage
 let savedHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
 savedHistory.forEach(msg => addMessage(msg.content, msg.role));
 chatHistory = savedHistory;
 
-// Input enter key
+// Enter key
 input.addEventListener("keypress", function(e){
     if(e.key === "Enter") askAI();
 });
 
-// Add message function
 function addMessage(text,type){
     const div = document.createElement("div");
     div.className = `message ${type}`;
@@ -134,7 +138,9 @@ async function askAI(){
         localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
     }catch(err){
         typingDiv.classList.remove("typing");
-        
+        typingDiv.innerText = "Error: Could not get AI response.";
+        console.error(err);
+    }
 }
 
 // Sidebar buttons
