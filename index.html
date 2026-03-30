@@ -79,14 +79,26 @@ Your futuristic AI assistant that helps answer questions,
 assist in studying, and generate creative ideas instantly.
 </p>
 
-<input type="text" placeholder="Ask your question...">
-<button>Ask AI</button>
+<input id="question" type="text" placeholder="Ask your question...">
+<button onclick="askAI()">Ask AI</button>
 
 <div class="footer">
 Created by Syed Usman Hashimi
 </div>
 
 </div>
+<script>
 
+async function askAI(){
+
+let q = document.getElementById("question").value
+
+if(!q) return
+
+alert("You asked: " + q)
+
+}
+
+</script>
 </body>
 </html>
