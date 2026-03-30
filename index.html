@@ -2,139 +2,155 @@
 <html>
 <head>
 <title>MY-AI Assistant</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-
 body{
-font-family: Arial, sans-serif;
-background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-color:white;
-text-align:center;
-padding:40px;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:white;
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
 }
-
 .container{
-max-width:700px;
-margin:auto;
-background:rgba(0,0,0,0.4);
-padding:40px;
-border-radius:15px;
-box-shadow:0 0 25px cyan;
+    width:700px;
+    background:rgba(0,0,0,0.4);
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 0 25px cyan;
+    display:flex;
+    flex-direction:column;
 }
-
 h1{
-font-size:40px;
-color:#00ffff;
-text-shadow:0 0 10px cyan;
+    text-align:center;
+    color:#00ffff;
+    margin-bottom:10px;
 }
-
-p{
-font-size:18px;
-opacity:0.9;
+.chat{
+    height:300px;
+    overflow-y:auto;
+    background:rgba(0,0,0,0.3);
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:20px;
 }
-
+.message{
+    margin-bottom:10px;
+    padding:10px;
+    border-radius:8px;
+}
+.user{
+    background:#00ffff;
+    color:black;
+    text-align:right;
+}
+.ai{
+    background:#ffffff;
+    color:black;
+}
+.input-area{
+    display:flex;
+}
 input{
-width:70%;
-padding:12px;
-border-radius:10px;
-border:none;
-margin-top:20px;
-font-size:16px;
+    flex:1;
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    font-size:16px;
 }
-
 button{
-padding:12px 25px;
-border:none;
-border-radius:10px;
-background:#00ffff;
-color:black;
-font-weight:bold;
-cursor:pointer;
-margin-left:10px;
-box-shadow:0 0 15px cyan;
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    background:#00ffff;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
+    margin-left:10px;
 }
-
 button:hover{
-background:white;
+    background:white;
 }
-
 .footer{
-margin-top:30px;
-font-size:14px;
-opacity:0.7;
+    text-align:center;
+    margin-top:15px;
+    font-size:13px;
+    opacity:0.7;
 }
-
 </style>
-
 </head>
-
 <body>
 
 <div class="container">
-
 <h1>MY-AI Assistant</h1>
 
-<p>
-Your futuristic AI assistant that helps answer questions,
-assist in studying, and generate creative ideas instantly.
-</p>
+<div id="chat" class="chat"></div>
 
-<input id="question" type="text" placeholder="Ask your question...">
-<button onclick="askAI()">Ask AI</button>
+<div class="input-area">
+    <input id="question" placeholder="Ask your question...">
+    <button onclick="askAI()">Ask AI</button>
+</div>
 
 <div class="footer">
 Created by Syed Usman Hashimi
 </div>
-
 </div>
+
 <script>
+const input = document.getElementById("question")
 
-
-
-let q = input.value
-if(!q) return
-
-addMessage(q,"user")
-input.value=""
-
-addMessage("Thinking...","ai")
-
-const response = await fetch("https://api.openai.com/v1/chat/completions",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer YOUR_API_KEY"
-},
-
-body:JSON.stringify({
-model:"gpt-4o-mini",
-messages:[
-{role:"user",content:q}
-]
+input.addEventListener("keypress",function(e){
+    if(e.key === "Enter"){
+        askAI()
+    }
 })
 
-})
-
-const data = await response.json()
-
-let reply = data.choices[0].message.content
-
-let chat = document.getElementById("chat")
-
-chat.lastChild.innerText = reply
-
+function addMessage(text,type){
+    let chat = document.getElementById("chat")
+    let div = document.createElement("div")
+    div.className = "message " + type
+    div.innerText = text
+    chat.appendChild(div)
+    chat.scrollTop = chat.scrollHeight
 }
 
-let q = document.getElementById("question").value
+async function askAI(){
+    let q = input.value
+    if(!q) return
+    addMessage(q,"user")
+    input.value=""
+    addMessage("AI is thinking...","ai")
 
-if(!q) return
+    try{
+        const response = await fetch("https://api.openai.com/v1/chat/completions",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer YOUR_API_KEY"
+            },
+            body:JSON.stringify({
+                model:"gpt-4o-mini",
+                messages:[
+                    {role:"system", content:"You are a smart AI assistant. Answer clearly, accurately and politely."},
+                    {role:"user", content:q}
+                ]
+            })
+        })
 
-alert("You asked: " + q)
+        const data = await response.json()
+        const reply = data.choices[0].message.content
 
+        let chat = document.getElementById("chat")
+        chat.lastChild.innerText = reply
+
+    }catch(err){
+        chat.lastChild.innerText = "Error: Could not get AI response."
+        console.error(err)
+    }
 }
-
 </script>
+
 </body>
 </html>
